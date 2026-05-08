@@ -156,8 +156,11 @@ async def perceive_text(
     )
 
     # Schedule mock-or-live pipeline (per CLAUDE.md decision #18 USE_MOCK_AGENTS).
-    # When force_fresh=True, also signal orchestrator to skip cache.set on completion.
-    perception["_skip_cache_write"] = bool(body.force_fresh)
+    # NOTE: force_fresh only controls cache.get bypass above (forces a real LLM
+    # run). We still write the result to cache so downstream operations like
+    # /ask-why can read it. Otherwise Mode 1 paste → score visible but Ask Why
+    # fails with content_not_found 404.
+    perception["_skip_cache_write"] = False
     background_tasks.add_task(orchestrator.run_pipeline, perception)
 
     return PerceiveTextResponse(
