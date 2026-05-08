@@ -3,17 +3,12 @@
 # Reference: https://docs.railway.app/reference/config-as-code
 
 [build]
-# Nixpacks auto-detects Python via pyproject.toml. We install uv first
-# (not in nixpacks default Python providers) then run uv sync.
-# `pip` isn't always in PATH under nixpacks → use `python -m pip` form.
-builder = "NIXPACKS"
-buildCommand = "python -m pip install uv && uv sync --frozen --no-dev"
+# Use Dockerfile for deterministic build (nixpacks' uv autodetect was broken).
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-# Start command — uvicorn binds $PORT (Railway-injected) on 0.0.0.0.
-# Single worker (--workers 1) since SSE streams are stateful per session.
-startCommand = "uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1"
-# Health check path — the FastAPI /health route
+# Healthcheck — FastAPI /health route returns {"status":"ok"}.
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 # Auto-restart on failure (decision #19 mandatory)
