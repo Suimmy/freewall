@@ -5,8 +5,9 @@
 [build]
 # Nixpacks auto-detects Python via pyproject.toml. We install uv first
 # (not in nixpacks default Python providers) then run uv sync.
+# `pip` isn't always in PATH under nixpacks → use `python -m pip` form.
 builder = "NIXPACKS"
-buildCommand = "pip install uv && uv sync --frozen --no-dev"
+buildCommand = "python -m pip install uv && uv sync --frozen --no-dev"
 
 [deploy]
 # Start command — uvicorn binds $PORT (Railway-injected) on 0.0.0.0.
