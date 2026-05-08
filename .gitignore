@@ -1,0 +1,48 @@
+# --- macOS ---
+.DS_Store
+**/.DS_Store
+
+# --- Python (subdir-level .gitignore also covers backend) ---
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.venv/
+**/venv/
+**/.python-version
+
+# --- Node / Vite ---
+**/node_modules/
+**/dist/
+**/.vite/
+**/*.log
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Secrets — never commit real .env, only .env.example ---
+**/.env
+**/.env.local
+**/.env.*.local
+!**/.env.example
+
+# --- Build artifacts ---
+build/
+**/build/
+*.whl
+
+# --- Reasoning state cache (runtime, ephemeral, contains user text) ---
+**/reasoning_cache/
+
+# --- ML data outputs (large, regenerable) ---
+ml/data/
+
+# --- Old/legacy locations from earlier scaffolding ---
+data/corpus/chroma_index/
+
+# --- Codegen outputs (regenerable via shared/codegen.sh) ---
+backend/app/schemas/_generated/

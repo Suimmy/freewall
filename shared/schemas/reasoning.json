@@ -1,0 +1,361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://freewall.local/schemas/reasoning.json",
+  "title": "ReasoningEvent",
+  "description": "L2 → L3 contract. Each SSE event sent on GET /stream/{session_id} matches one of the event variants below. UI dispatches on the 'type' field. Enum values must match shared/ENUMS.md verbatim.",
+  "oneOf": [
+    { "$ref": "#/$defs/CoordinatorDispatchedEvent" },
+    { "$ref": "#/$defs/AgentStartedEvent" },
+    { "$ref": "#/$defs/AgentFinishedEvent" },
+    { "$ref": "#/$defs/ScoreUpdateEvent" },
+    { "$ref": "#/$defs/FinalEvent" },
+    { "$ref": "#/$defs/ErrorEvent" }
+  ],
+
+  "$defs": {
+
+    "AgentName": {
+      "type": "string",
+      "description": "Identifier for one of the 6 agents. Coordinator dispatches the others; classifier runs in L1.",
+      "enum": ["coordinator", "classifier", "persuasion", "fact_check", "provenance", "counter"]
+    },
+
+    "EventBase": {
+      "type": "object",
+      "description": "Fields every event carries. All concrete events extend this implicitly via 'required'.",
+      "required": ["type", "session_id", "content_id", "timestamp"],
+      "properties": {
+        "type": { "type": "string" },
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "SovereigntyScore": {
+      "type": "object",
+      "description": "Aggregated risk score 0-100 (higher = safer). Computed by Coordinator using XGBoost (or weighted-sum fallback per triage).",
+      "required": ["value", "band", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Sovereignty score. Higher = lower manipulation risk."
+        },
+        "band": {
+          "type": "string",
+          "description": "See ENUMS.md → ScoreBand. Derived from value (70-100 safe, 30-69 caution, 0-29 high_risk).",
+          "enum": ["safe", "caution", "high_risk"]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Coordinator's confidence in this score (lowered when agents disagree or returned errors)."
+        },
+        "contributing_factors": {
+          "type": "array",
+          "description": "Top reasons for the score, ordered by weight. Used by 'Ask why' modal.",
+          "items": {
+            "type": "object",
+            "required": ["factor", "weight"],
+            "additionalProperties": false,
+            "properties": {
+              "factor": { "type": "string", "description": "Human-readable factor (e.g., 'Fear-mongering tactic detected', 'Source rated unreliable')." },
+              "weight": { "type": "number", "minimum": -1, "maximum": 1, "description": "Signed contribution to score (negative reduces score)." }
+            }
+          }
+        }
+      }
+    },
+
+    "PersuasionFinding": {
+      "type": "object",
+      "description": "Output of Persuasion Agent. Detects tactics from PersuSafety 15 + Cialdini 6 (see ENUMS.md → PersuasionTactic).",
+      "required": ["tactics_detected", "intended_action"],
+      "additionalProperties": false,
+      "properties": {
+        "tactics_detected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["tactic", "evidence", "confidence"],
+            "additionalProperties": false,
+            "properties": {
+              "tactic": {
+                "type": "string",
+                "description": "One of 21 values from ENUMS.md → PersuasionTactic. Verbatim labels.",
+                "enum": [
+                  "reciprocation", "commitment_consistency", "social_proof", "liking", "authority", "scarcity",
+                  "manipulative_emotional_appeals", "false_scarcity", "deceptive_information", "bait_and_switch",
+                  "exploitative_cult_tactics", "guilt_tripping", "fear_mongering", "pressure_and_coercion",
+                  "exploiting_vulnerable_individuals", "creating_dependency", "misrepresentation_of_expertise",
+                  "social_isolation", "overwhelming_information", "playing_on_identity", "financial_exploitation"
+                ]
+              },
+              "evidence": { "type": "string", "description": "Quoted span from the content that triggered this tactic." },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "intended_action": {
+          "type": "string",
+          "description": "What the content is trying to get the user to do (e.g., 'buy supplement', 'share post', 'distrust vaccines')."
+        },
+        "hidden_agenda": {
+          "type": ["string", "null"],
+          "description": "Inferred motive beyond the surface ask, if any (e.g., 'affiliate revenue', 'political mobilization'). null if unclear."
+        }
+      }
+    },
+
+    "FactCheckFinding": {
+      "type": "object",
+      "description": "Output of Fact-Check Agent. RAG-grounded against WHO/CDC/Mayo corpus.",
+      "required": ["claims"],
+      "additionalProperties": false,
+      "properties": {
+        "claims": {
+          "type": "array",
+          "description": "Each factual claim extracted from the content, verified independently.",
+          "items": {
+            "type": "object",
+            "required": ["claim", "verdict"],
+            "additionalProperties": false,
+            "properties": {
+              "claim": { "type": "string", "description": "Atomic factual claim extracted from content." },
+              "verdict": {
+                "type": "string",
+                "description": "See ENUMS.md → FactCheckVerdict.",
+                "enum": ["supported", "contradicted", "unverifiable", "not_a_claim"]
+              },
+              "explanation": { "type": "string", "description": "Brief reason for the verdict." },
+              "sources": {
+                "type": "array",
+                "description": "RAG-retrieved sources backing the verdict. Empty for 'not_a_claim'.",
+                "items": {
+                  "type": "object",
+                  "required": ["title", "url"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "title": { "type": "string" },
+                    "url": { "type": "string", "format": "uri" },
+                    "publisher": { "type": "string", "description": "WHO, CDC, Mayo Clinic, etc." },
+                    "snippet": { "type": "string", "description": "Quoted relevant fragment from the source." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "ProvenanceFinding": {
+      "type": "object",
+      "description": "Output of Provenance Agent. Reasons over L1's synthetic_signals + source.reputation.",
+      "required": ["synthetic_verdict", "source_verdict", "reasoning"],
+      "additionalProperties": false,
+      "properties": {
+        "synthetic_verdict": {
+          "type": "string",
+          "description": "See ENUMS.md → SyntheticVerdict.",
+          "enum": ["likely_human", "uncertain", "likely_ai"]
+        },
+        "source_verdict": {
+          "type": "string",
+          "description": "Provenance Agent may upgrade or downgrade the L1 hardcoded reputation based on cross-referencing.",
+          "enum": ["credible", "mixed", "unreliable", "unknown"]
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "1-2 sentence rationale explaining the verdicts. Surfaced in 'Ask why' modal."
+        }
+      }
+    },
+
+    "CounterPerspectiveFinding": {
+      "type": "object",
+      "description": "Output of Counter-Perspective Agent. Optional — runs auto when score < 50, lazy on click otherwise.",
+      "required": ["steelman"],
+      "additionalProperties": false,
+      "properties": {
+        "steelman": {
+          "type": "string",
+          "description": "Best-faith opposing view to the content's claim, written as a coherent argument the user can engage with."
+        },
+        "alternative_sources": {
+          "type": "array",
+          "description": "Higher-credibility sources offering a different angle.",
+          "items": {
+            "type": "object",
+            "required": ["url", "title"],
+            "additionalProperties": false,
+            "properties": {
+              "url": { "type": "string", "format": "uri" },
+              "title": { "type": "string" },
+              "publisher": { "type": "string" },
+              "credibility": {
+                "type": "string",
+                "enum": ["credible", "mixed", "unreliable", "unknown"]
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "ReasoningState": {
+      "type": "object",
+      "description": "Full reasoning result for one content_id. Carried by the 'final' event so a UI reconnecting late gets complete state.",
+      "required": ["score", "dispatched_agents"],
+      "additionalProperties": false,
+      "properties": {
+        "score": { "$ref": "#/$defs/SovereigntyScore" },
+        "dispatched_agents": {
+          "type": "array",
+          "description": "Which L2 agents Coordinator decided to run for this content.",
+          "items": { "$ref": "#/$defs/AgentName" }
+        },
+        "skipped_agents": {
+          "type": "array",
+          "description": "Agents Coordinator deliberately skipped, with reason (e.g., 'meme → skip Fact-Check').",
+          "items": {
+            "type": "object",
+            "required": ["agent", "reason"],
+            "additionalProperties": false,
+            "properties": {
+              "agent": { "$ref": "#/$defs/AgentName" },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "persuasion": { "$ref": "#/$defs/PersuasionFinding" },
+        "fact_check": { "$ref": "#/$defs/FactCheckFinding" },
+        "provenance": { "$ref": "#/$defs/ProvenanceFinding" },
+        "counter": { "$ref": "#/$defs/CounterPerspectiveFinding" }
+      }
+    },
+
+    "CoordinatorDispatchedEvent": {
+      "type": "object",
+      "description": "Fired first, after Coordinator decides which agents to run. UI renders agent slots based on this.",
+      "required": ["type", "session_id", "content_id", "timestamp", "dispatched_agents"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "coordinator_dispatched" },
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "dispatched_agents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AgentName" }
+        },
+        "skipped_agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["agent", "reason"],
+            "properties": {
+              "agent": { "$ref": "#/$defs/AgentName" },
+              "reason": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "AgentStartedEvent": {
+      "type": "object",
+      "description": "Fired when a dispatched agent begins execution. UI shows 'thinking' spinner on its slot.",
+      "required": ["type", "session_id", "content_id", "timestamp", "agent"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "agent_started" },
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "agent": { "$ref": "#/$defs/AgentName" }
+      }
+    },
+
+    "AgentFinishedEvent": {
+      "type": "object",
+      "description": "Fired when an agent completes with its finding. Shape of 'finding' varies by 'agent' — UI dispatches on agent name.",
+      "required": ["type", "session_id", "content_id", "timestamp", "agent", "finding"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "agent_finished" },
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "agent": { "$ref": "#/$defs/AgentName" },
+        "finding": {
+          "description": "Concrete shape depends on agent: persuasion → PersuasionFinding, fact_check → FactCheckFinding, provenance → ProvenanceFinding, counter → CounterPerspectiveFinding.",
+          "oneOf": [
+            { "$ref": "#/$defs/PersuasionFinding" },
+            { "$ref": "#/$defs/FactCheckFinding" },
+            { "$ref": "#/$defs/ProvenanceFinding" },
+            { "$ref": "#/$defs/CounterPerspectiveFinding" }
+          ]
+        }
+      }
+    },
+
+    "ScoreUpdateEvent": {
+      "type": "object",
+      "description": "Fired when Coordinator computes (or recomputes) sovereignty score. Can fire mid-stream as agents complete.",
+      "required": ["type", "session_id", "content_id", "timestamp", "score"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "score_update" },
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "score": { "$ref": "#/$defs/SovereigntyScore" }
+      }
+    },
+
+    "FinalEvent": {
+      "type": "object",
+      "description": "Last event for a content_id. Carries full ReasoningState — UI reconnecting late uses this to render complete view.",
+      "required": ["type", "session_id", "content_id", "timestamp", "state"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "final" },
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "state": { "$ref": "#/$defs/ReasoningState" }
+      }
+    },
+
+    "ErrorEvent": {
+      "type": "object",
+      "description": "Per-agent or global failure. UI degrades gracefully — show partial findings rather than blocking.",
+      "required": ["type", "session_id", "content_id", "timestamp", "error"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "error" },
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "agent": {
+          "description": "If error is scoped to one agent. Omit for global errors.",
+          "$ref": "#/$defs/AgentName"
+        },
+        "error": {
+          "type": "object",
+          "required": ["code", "message"],
+          "additionalProperties": false,
+          "properties": {
+            "code": { "type": "string", "description": "Stable error code (e.g., 'llm_timeout', 'rag_unavailable', 'invalid_input')." },
+            "message": { "type": "string", "description": "Human-readable message. Safe to show in dev UI; production UI should map by code." }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "feed_001_temple_cure": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta"
+  },
+  "feed_002_radican": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta",
+    "image_ai_confidence": 0.9655,
+    "image_ai_model": "prithivMLmods/deepfake-detector-model-v1"
+  },
+  "feed_003_cortisol": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta",
+    "image_ai_confidence": 0.0679,
+    "image_ai_model": "eftt/VideoMae-ffc23-deepfake-detector"
+  },
+  "feed_004_rauwolfia": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta",
+    "image_ai_confidence": 0.325,
+    "image_ai_model": "prithivMLmods/deepfake-detector-model-v1"
+  },
+  "feed_005_sibutramine": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta"
+  },
+  "feed_006_cancer_herbs": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta"
+  },
+  "feed_008_skincare_diy": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta",
+    "image_ai_confidence": 0.2230,
+    "image_ai_model": "eftt/VideoMae-ffc23-deepfake-detector"
+  },
+  "feed_009_targeted_therapy": {
+    "text_ai_confidence": 0.0,
+    "label": "Human",
+    "score_raw": 1.0,
+    "model": "Hello-SimpleAI/chatgpt-detector-roberta"
+  }
+}

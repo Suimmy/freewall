@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0",
+  "category": "unreliable",
+  "last_updated": "2026-05-07",
+  "notes": "Repeatedly documented as sources of health misinformation, conspiracy, or pseudoscience by independent fact-checkers (MBFC, Snopes, FactCheck.org, NewsGuard). Bootstrapped from Claude training knowledge with HIGH confidence — domains here are well-documented. Thai-language unreliable sources are deliberately under-populated; Suim and team should add demo-specific Thai mock-domains in Phase 4.",
+  "domains": [
+    {
+      "domain": "naturalnews.com",
+      "name": "Natural News",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "Mike Adams; documented anti-vaccine misinformation, COVID-19 misinformation, pseudoscience"
+    },
+    {
+      "domain": "mercola.com",
+      "name": "Mercola",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "Joseph Mercola; documented anti-vaccine misinformation; FDA warning letters issued"
+    },
+    {
+      "domain": "infowars.com",
+      "name": "Infowars",
+      "type": "conspiracy",
+      "lang": ["en"],
+      "notes": "Alex Jones; Sandy Hook conspiracy (court rulings), COVID misinfo, multiple defamation losses"
+    },
+    {
+      "domain": "ageofautism.com",
+      "name": "Age of Autism",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "Anti-vaccine; promotes the disproven vaccines-cause-autism narrative"
+    },
+    {
+      "domain": "vaccineimpact.com",
+      "name": "Vaccine Impact",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "Anti-vaccine content; misrepresents VAERS data"
+    },
+    {
+      "domain": "childrenshealthdefense.org",
+      "name": "Children's Health Defense",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "RFK Jr.-founded org; documented anti-vaccine misinformation"
+    },
+    {
+      "domain": "greenmedinfo.com",
+      "name": "GreenMedInfo",
+      "type": "pseudoscience",
+      "lang": ["en"],
+      "notes": "Promotes unproven 'natural' alternatives; cherry-picks studies"
+    },
+    {
+      "domain": "naturalhealth365.com",
+      "name": "Natural Health 365",
+      "type": "pseudoscience",
+      "lang": ["en"],
+      "notes": "Anti-vaccine, alternative medicine claims without evidence"
+    },
+    {
+      "domain": "globalresearch.ca",
+      "name": "Global Research",
+      "type": "conspiracy",
+      "lang": ["en"],
+      "notes": "Centre for Research on Globalization; conspiracy theories, COVID misinformation"
+    },
+    {
+      "domain": "thegatewaypundit.com",
+      "name": "The Gateway Pundit",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "Repeatedly fact-checked false; election misinformation; some health misinfo"
+    },
+    {
+      "domain": "zerohedge.com",
+      "name": "ZeroHedge",
+      "type": "conspiracy",
+      "lang": ["en"],
+      "notes": "Financial-political conspiracy site; banned/suspended by major platforms for COVID misinfo"
+    },
+    {
+      "domain": "rense.com",
+      "name": "Rense.com",
+      "type": "conspiracy",
+      "lang": ["en"],
+      "notes": "Long-running conspiracy hub; pseudoscience, anti-vaccine, anti-Semitic content"
+    },
+    {
+      "domain": "davidicke.com",
+      "name": "David Icke",
+      "type": "conspiracy",
+      "lang": ["en"],
+      "notes": "Conspiracy theories (reptilian elite); COVID misinformation; banned from major platforms"
+    },
+    {
+      "domain": "prisonplanet.com",
+      "name": "Prison Planet",
+      "type": "conspiracy",
+      "lang": ["en"],
+      "notes": "Affiliated with Infowars; conspiracy theories"
+    },
+    {
+      "domain": "healthnutnews.com",
+      "name": "Health Nut News",
+      "type": "pseudoscience",
+      "lang": ["en"],
+      "notes": "'Holistic doctor deaths' conspiracy origin; unproven medical claims"
+    },
+    {
+      "domain": "rt.com",
+      "name": "RT (Russia Today)",
+      "type": "known_misinfo",
+      "lang": ["en", "multilingual"],
+      "notes": "Russian state media; documented disinformation campaigns; sanctioned by EU"
+    },
+    {
+      "domain": "sputniknews.com",
+      "name": "Sputnik News",
+      "type": "known_misinfo",
+      "lang": ["en", "multilingual"],
+      "notes": "Russian state media; documented disinformation campaigns; sanctioned by EU"
+    },
+    {
+      "domain": "beforeitsnews.com",
+      "name": "Before It's News",
+      "type": "conspiracy",
+      "lang": ["en"],
+      "notes": "User-submitted content; minimal editorial review; conspiracy hub"
+    },
+    {
+      "domain": "yournewswire.com",
+      "name": "YourNewsWire / NewsPunch",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "Repeatedly fact-checked false; rebranded to 'NewsPunch' (newspunch.com)"
+    },
+    {
+      "domain": "newspunch.com",
+      "name": "NewsPunch",
+      "type": "known_misinfo",
+      "lang": ["en"],
+      "notes": "Rebrand of YourNewsWire; repeatedly fact-checked false health and political claims"
+    }
+  ]
+}

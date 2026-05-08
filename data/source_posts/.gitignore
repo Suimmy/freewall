@@ -1,0 +1,8 @@
+# Real curated content — anonymized but still potentially identifying. Never commit.
+*.jsonl
+*.csv
+_author_mapping*.txt
+_author_mapping*.csv
+
+# But DO commit example.jsonl (3-5 fake posts) for tests / smoke tests.
+!example.jsonl

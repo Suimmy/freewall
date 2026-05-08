@@ -1,0 +1,2 @@
+file,model,num_frames,prediction,fake_score,real_score,confidence,confidence_level,fake_threshold,raw_scores,warning
+/content/videos/v24025gl0000d7gn547og65qbc8dfr30 (1).mp4,eftt/VideoMae-ffc23-deepfake-detector,16,real,0.067931,0.932069,0.932069,high,0.5,"{'real': 0.9320688247680664, 'fake': 0.067931167781353}",This detector checks visual manipulation/deepfake signals. It does not verify whether the news claim is factually true.

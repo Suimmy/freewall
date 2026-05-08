@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://freewall.local/schemas/perception.json",
+  "title": "PerceptionPayload",
+  "description": "L1 → L2 contract. Body of POST /perceive. One payload per content unit entering viewport (definition of 'unit' is site-specific, set by scraper.ts — see CLAUDE.md decision #15). Enum values must match shared/ENUMS.md verbatim.",
+  "type": "object",
+  "required": ["session_id", "content_id", "url", "captured_at", "content", "source"],
+  "additionalProperties": false,
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Browser tab session UUID. Used to subscribe to SSE stream and to bind reasoning updates back to the originating tab. One tab = one session."
+    },
+    "content_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable ID for one content unit within the session — hash of content text + URL fragment recommended. A 'content unit' is defined by scraper.ts per site type: 1 tweet on Twitter, 1 post on IG, 1 article on news sites, 1 AI message on ChatGPT, etc. Used by L2 to dedupe and by L3 to bind reasoning back to the right DOM element."
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Full URL of the page hosting the content."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the extension captured this perception."
+    },
+    "content": {
+      "type": "object",
+      "required": ["text", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Visible text of the post. Required even if empty (e.g., image-only post → empty string)."
+        },
+        "images": {
+          "type": "array",
+          "description": "URLs of images in the post (in DOM order). Empty array if no images.",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "default": []
+        },
+        "category": {
+          "type": "string",
+          "description": "Output of Content Classifier Agent (L1). See shared/ENUMS.md → ContentCategory.",
+          "enum": ["news", "ad", "health_claim", "social", "meme", "unknown"]
+        },
+        "category_confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Classifier confidence in the category (0..1). Used by Coordinator to decide when to fall through to all-agent dispatch on low confidence."
+        }
+      }
+    },
+    "synthetic_signals": {
+      "type": "object",
+      "description": "Output of in-browser ML detectors. Optional — extension may omit fields if a detector hasn't loaded. Provenance Agent in L2 must handle missing fields gracefully.",
+      "additionalProperties": false,
+      "properties": {
+        "ai_text_prob": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Probability the text is AI-generated (perplexity-based or HF detector)."
+        },
+        "ai_image_prob": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Highest AI-gen probability across images in the post (single number — Provenance Agent decides aggregation)."
+        },
+        "c2pa_present": {
+          "type": "boolean",
+          "description": "Whether ANY image in the post carries C2PA Content Credentials metadata."
+        },
+        "c2pa_verified": {
+          "type": "boolean",
+          "description": "Whether the C2PA chain validates as human-captured (only meaningful if c2pa_present is true)."
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["domain", "reputation"],
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "type": "string",
+          "minLength": 1,
+          "description": "eTLD+1 normalized hostname of the page (e.g., 'example.com' not 'www.example.com')."
+        },
+        "reputation": {
+          "type": "string",
+          "description": "From hardcoded list in data/source_reputation/. See shared/ENUMS.md → SourceReputation.",
+          "enum": ["credible", "mixed", "unreliable", "unknown"]
+        }
+      }
+    },
+    "user_state": {
+      "type": "object",
+      "description": "Behavioral context. Optional. Per architecture.md, used as gating signal for annotation aggressiveness — NEVER primary detection.",
+      "additionalProperties": false,
+      "properties": {
+        "scroll_velocity_px_per_sec": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Rolling-average scroll speed when this content was captured."
+        },
+        "dwell_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Milliseconds the content was visible in viewport before perception was triggered."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://freewall.local/schemas/agent_io.json",
+  "title": "AgentIO",
+  "description": "Per-agent INPUT contracts. Outputs are 'findings' defined in reasoning.json (cross-file $ref). When implementing each agent (OpenAI Agents SDK structured output), use these as the input contract and the corresponding finding schema as the response_format.\n\nMapping (input → output):\n- ClassifierInput → ClassifierOutput (defined here, consumed by perception.json content.category)\n- CoordinatorInput → CoordinatorOutput (defined here, consumed by services/orchestrator.py for parallel L2 dispatch)\n- PersuasionAgentInput → reasoning.json#/$defs/PersuasionFinding\n- FactCheckAgentInput → reasoning.json#/$defs/FactCheckFinding\n- ProvenanceAgentInput → reasoning.json#/$defs/ProvenanceFinding\n- CounterPerspectiveAgentInput → reasoning.json#/$defs/CounterPerspectiveFinding\n\nCoordinator is an LLM agent (CLAUDE.md decision #5) using reasoning_effort=low, NOT Python orchestration. Its output drives parallel L2 worker dispatch.",
+
+  "$defs": {
+
+    "AgentInputBase": {
+      "type": "object",
+      "description": "Shared correlation fields. Every agent input includes these so logs and traces line up across the system.",
+      "required": ["session_id", "content_id"],
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Browser tab session UUID (carried from perception.json)."
+        },
+        "content_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable per-content-unit ID (carried from perception.json)."
+        }
+      }
+    },
+
+    "ClassifierInput": {
+      "type": "object",
+      "description": "Input for Content Classifier Agent (runs in L1, before Coordinator). Output goes into perception.json#/properties/content/category.",
+      "required": ["session_id", "content_id", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "text": {
+          "type": "string",
+          "description": "Visible text to classify."
+        },
+        "image_urls": {
+          "type": "array",
+          "description": "Optional. If model supports vision, lets classifier consider image cues (e.g., meme format, ad layout).",
+          "items": { "type": "string", "format": "uri" },
+          "default": []
+        }
+      }
+    },
+
+    "ClassifierOutput": {
+      "type": "object",
+      "description": "Output of Content Classifier Agent. Fed into perception.json before POST /perceive.",
+      "required": ["category", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "See ENUMS.md → ContentCategory.",
+          "enum": ["news", "ad", "health_claim", "social", "meme", "unknown"]
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "CoordinatorInput": {
+      "type": "object",
+      "description": "Input for L2 Coordinator agent. Decides which workers (persuasion/fact_check/provenance) to dispatch based on category + confidence. Counter-Perspective is dispatched separately by orchestrator (lazy, score<50) and is NEVER a valid value in CoordinatorOutput.",
+      "required": ["session_id", "content_id", "category", "category_confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "category": {
+          "type": "string",
+          "enum": ["news", "ad", "health_claim", "social", "meme", "unknown"]
+        },
+        "category_confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "L1 Classifier confidence. Coordinator overrides skip rules when this is low (< 0.5) — dispatch ALL workers as safe default."
+        }
+      }
+    },
+
+    "DispatchableAgent": {
+      "type": "string",
+      "description": "L2 worker agents Coordinator can route. Counter is excluded by design — orchestrator runs it as a second wave only when score < 50.",
+      "enum": ["persuasion", "fact_check", "provenance"]
+    },
+
+    "SkippedAgent": {
+      "type": "object",
+      "description": "One skipped worker with a brief justification.",
+      "required": ["agent", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "agent": { "$ref": "#/$defs/DispatchableAgent" },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "1-line specific justification, e.g., 'meme — no factual claim to verify'."
+        }
+      }
+    },
+
+    "CoordinatorOutput": {
+      "type": "object",
+      "description": "Coordinator dispatch decision. dispatched_agents ∪ skipped_agents must cover ALL 3 workers (no agent missing, no duplicates). Invariant enforced in prompt, not schema (JSON Schema can't express set-cover constraints cleanly).",
+      "required": ["dispatched_agents", "skipped_agents"],
+      "additionalProperties": false,
+      "properties": {
+        "dispatched_agents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DispatchableAgent" },
+          "uniqueItems": true,
+          "description": "Workers to invoke in parallel."
+        },
+        "skipped_agents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SkippedAgent" },
+          "description": "Workers to skip, with reasons. Empty array if all are dispatched."
+        }
+      }
+    },
+
+    "PersuasionAgentInput": {
+      "type": "object",
+      "description": "Input for Persuasion Agent (L2). Output → reasoning.json#/$defs/PersuasionFinding.",
+      "required": ["session_id", "content_id", "text", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "text": {
+          "type": "string",
+          "description": "Full visible text. Persuasion Agent quotes spans from this as evidence."
+        },
+        "category": {
+          "type": "string",
+          "description": "Helps prompt narrow which tactic patterns are most likely (e.g., 'ad' → emphasize Cialdini scarcity/authority; 'health_claim' → emphasize fear_mongering, misrepresentation_of_expertise).",
+          "enum": ["news", "ad", "health_claim", "social", "meme", "unknown"]
+        }
+      }
+    },
+
+    "FactCheckAgentInput": {
+      "type": "object",
+      "description": "Input for Fact-Check Agent (L2). Output → reasoning.json#/$defs/FactCheckFinding. Agent runs RAG over data/corpus/{who,cdc,mayo}.",
+      "required": ["session_id", "content_id", "text", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "text": {
+          "type": "string",
+          "description": "Full visible text. Agent extracts atomic claims from this and verifies each."
+        },
+        "category": {
+          "type": "string",
+          "description": "Coordinator will not dispatch Fact-Check for category='meme'. Other categories pass through; agent itself returns 'not_a_claim' for opinion-only content.",
+          "enum": ["news", "ad", "health_claim", "social", "unknown"]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Page URL — sometimes hints at topic (e.g., 'who.int/...' suggests authoritative health source)."
+        }
+      }
+    },
+
+    "ProvenanceAgentInput": {
+      "type": "object",
+      "description": "Input for Provenance Agent (L2). Output → reasoning.json#/$defs/ProvenanceFinding. Reasons over L1 detector outputs — does NOT re-run ML.",
+      "required": ["session_id", "content_id", "text_excerpt", "synthetic_signals", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "text_excerpt": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Short excerpt (≤500 chars) — Provenance reasons over signals not full content. Long text is wasted tokens here."
+        },
+        "synthetic_signals": {
+          "type": "object",
+          "description": "Carried from perception.json#/properties/synthetic_signals. Agent must handle missing fields (e.g., ai_image_prob absent if no images, c2pa fields absent if not detected).",
+          "properties": {
+            "ai_text_prob": { "type": "number", "minimum": 0, "maximum": 1 },
+            "ai_image_prob": { "type": "number", "minimum": 0, "maximum": 1 },
+            "c2pa_present": { "type": "boolean" },
+            "c2pa_verified": { "type": "boolean" }
+          }
+        },
+        "source": {
+          "type": "object",
+          "required": ["domain", "reputation"],
+          "properties": {
+            "domain": { "type": "string" },
+            "reputation": {
+              "type": "string",
+              "enum": ["credible", "mixed", "unreliable", "unknown"]
+            }
+          }
+        }
+      }
+    },
+
+    "CounterPerspectiveAgentInput": {
+      "type": "object",
+      "description": "Input for Counter-Perspective Agent (L2). Output → reasoning.json#/$defs/CounterPerspectiveFinding. UNIQUE: takes prior findings as input — needs them to write a focused steelman that engages with what was actually claimed.",
+      "required": ["session_id", "content_id", "text", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "session_id": { "type": "string", "format": "uuid" },
+        "content_id": { "type": "string", "minLength": 1 },
+        "text": { "type": "string" },
+        "category": {
+          "type": "string",
+          "enum": ["news", "ad", "health_claim", "social", "meme", "unknown"]
+        },
+        "prior_findings": {
+          "type": "object",
+          "description": "Findings from earlier-completing agents. Coordinator passes whatever is available when Counter is dispatched. All optional — agent degrades gracefully (writes general-purpose steelman if no prior findings).",
+          "additionalProperties": false,
+          "properties": {
+            "persuasion": {
+              "$ref": "./reasoning.json#/$defs/PersuasionFinding"
+            },
+            "fact_check": {
+              "$ref": "./reasoning.json#/$defs/FactCheckFinding"
+            },
+            "provenance": {
+              "$ref": "./reasoning.json#/$defs/ProvenanceFinding"
+            }
+          }
+        }
+      }
+    }
+  }
+}

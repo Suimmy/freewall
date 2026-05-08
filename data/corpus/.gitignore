@@ -1,0 +1,11 @@
+# keep all .md fact sheets committed (verifiable, public-source content)
+# but ignore the generated Chroma DB
+
+chroma_db/
+*.duckdb
+*.parquet
+
+# dev artifacts
+*.pyc
+__pycache__/
+.ipynb_checkpoints/

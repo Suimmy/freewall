@@ -1,0 +1,253 @@
+{
+  "schema_version": "1.0",
+  "category": "credible",
+  "last_updated": "2026-05-07",
+  "notes": "Authoritative international, governmental, medical, and reputable journalistic sources. Bootstrapped from Claude training knowledge — Suim should review before production use.",
+  "domains": [
+    {
+      "domain": "who.int",
+      "name": "World Health Organization",
+      "type": "international_authority",
+      "lang": ["en", "multilingual"],
+      "notes": "UN specialized agency for international public health"
+    },
+    {
+      "domain": "unicef.org",
+      "name": "United Nations Children's Fund",
+      "type": "international_authority",
+      "lang": ["en", "multilingual"],
+      "notes": "UN agency on child welfare; publishes on child & maternal health"
+    },
+    {
+      "domain": "cdc.gov",
+      "name": "Centers for Disease Control and Prevention",
+      "type": "govt_health",
+      "lang": ["en"],
+      "notes": "US federal public health agency"
+    },
+    {
+      "domain": "fda.gov",
+      "name": "U.S. Food and Drug Administration",
+      "type": "govt_health",
+      "lang": ["en"],
+      "notes": "US federal regulator for food, drugs, devices"
+    },
+    {
+      "domain": "nih.gov",
+      "name": "U.S. National Institutes of Health",
+      "type": "govt_health",
+      "lang": ["en"],
+      "notes": "US federal biomedical research agency"
+    },
+    {
+      "domain": "nhs.uk",
+      "name": "UK National Health Service",
+      "type": "govt_health",
+      "lang": ["en"],
+      "notes": "UK public healthcare provider"
+    },
+    {
+      "domain": "ddc.moph.go.th",
+      "name": "กรมควบคุมโรค (Department of Disease Control)",
+      "type": "govt_health",
+      "lang": ["th"],
+      "notes": "Thai Ministry of Public Health — Department of Disease Control"
+    },
+    {
+      "domain": "moph.go.th",
+      "name": "กระทรวงสาธารณสุข (Ministry of Public Health, Thailand)",
+      "type": "govt_health",
+      "lang": ["th"],
+      "notes": "Thailand's national health ministry"
+    },
+    {
+      "domain": "thailand.who.int",
+      "name": "WHO Thailand",
+      "type": "international_authority",
+      "lang": ["en", "th"],
+      "notes": "WHO country office for Thailand"
+    },
+    {
+      "domain": "mayoclinic.org",
+      "name": "Mayo Clinic",
+      "type": "medical_school",
+      "lang": ["en"],
+      "notes": "Nonprofit academic medical center"
+    },
+    {
+      "domain": "hopkinsmedicine.org",
+      "name": "Johns Hopkins Medicine",
+      "type": "medical_school",
+      "lang": ["en"],
+      "notes": "Johns Hopkins University academic medical center"
+    },
+    {
+      "domain": "clevelandclinic.org",
+      "name": "Cleveland Clinic",
+      "type": "medical_school",
+      "lang": ["en"],
+      "notes": "Nonprofit academic medical center"
+    },
+    {
+      "domain": "hms.harvard.edu",
+      "name": "Harvard Medical School",
+      "type": "medical_school",
+      "lang": ["en"],
+      "notes": "Harvard University medical school"
+    },
+    {
+      "domain": "si.mahidol.ac.th",
+      "name": "คณะแพทยศาสตร์ศิริราชพยาบาล (Siriraj Hospital, Mahidol)",
+      "type": "medical_school",
+      "lang": ["th", "en"],
+      "notes": "Thailand's oldest and largest medical school + hospital"
+    },
+    {
+      "domain": "rama.mahidol.ac.th",
+      "name": "โรงพยาบาลรามาธิบดี (Ramathibodi Hospital, Mahidol)",
+      "type": "medical_school",
+      "lang": ["th", "en"],
+      "notes": "Mahidol University Faculty of Medicine — major Thai academic hospital"
+    },
+    {
+      "domain": "chulalongkornhospital.go.th",
+      "name": "โรงพยาบาลจุฬาลงกรณ์ สภากาชาดไทย",
+      "type": "medical_school",
+      "lang": ["th"],
+      "notes": "King Chulalongkorn Memorial Hospital — Chulalongkorn University affiliated"
+    },
+    {
+      "domain": "med.cmu.ac.th",
+      "name": "คณะแพทยศาสตร์ มหาวิทยาลัยเชียงใหม่",
+      "type": "medical_school",
+      "lang": ["th"],
+      "notes": "Chiang Mai University Faculty of Medicine"
+    },
+    {
+      "domain": "nejm.org",
+      "name": "New England Journal of Medicine",
+      "type": "medical_journal",
+      "lang": ["en"],
+      "notes": "Peer-reviewed general medical journal, ~150-year history"
+    },
+    {
+      "domain": "thelancet.com",
+      "name": "The Lancet",
+      "type": "medical_journal",
+      "lang": ["en"],
+      "notes": "Peer-reviewed general medical journal"
+    },
+    {
+      "domain": "jamanetwork.com",
+      "name": "JAMA Network",
+      "type": "medical_journal",
+      "lang": ["en"],
+      "notes": "American Medical Association journals"
+    },
+    {
+      "domain": "bmj.com",
+      "name": "The BMJ (British Medical Journal)",
+      "type": "medical_journal",
+      "lang": ["en"],
+      "notes": "Peer-reviewed general medical journal"
+    },
+    {
+      "domain": "nature.com",
+      "name": "Nature",
+      "type": "medical_journal",
+      "lang": ["en"],
+      "notes": "Multidisciplinary scientific journal — covers medicine"
+    },
+    {
+      "domain": "science.org",
+      "name": "Science (AAAS)",
+      "type": "medical_journal",
+      "lang": ["en"],
+      "notes": "American Association for the Advancement of Science journal"
+    },
+    {
+      "domain": "pubmed.ncbi.nlm.nih.gov",
+      "name": "PubMed",
+      "type": "medical_journal",
+      "lang": ["en"],
+      "notes": "NIH biomedical literature index — citations to peer-reviewed articles"
+    },
+    {
+      "domain": "reuters.com",
+      "name": "Reuters",
+      "type": "reputable_news",
+      "lang": ["en", "multilingual"],
+      "notes": "International news agency, generally rated high factual reporting"
+    },
+    {
+      "domain": "apnews.com",
+      "name": "Associated Press",
+      "type": "reputable_news",
+      "lang": ["en", "multilingual"],
+      "notes": "Independent news cooperative, generally high factual reporting"
+    },
+    {
+      "domain": "bbc.com",
+      "name": "BBC News",
+      "type": "reputable_news",
+      "lang": ["en", "multilingual"],
+      "notes": "British public broadcaster — international news"
+    },
+    {
+      "domain": "npr.org",
+      "name": "National Public Radio",
+      "type": "reputable_news",
+      "lang": ["en"],
+      "notes": "US public radio network"
+    },
+    {
+      "domain": "thaipbs.or.th",
+      "name": "Thai Public Broadcasting Service",
+      "type": "reputable_news",
+      "lang": ["th"],
+      "notes": "Thailand's public broadcaster — incl. ThaiPBS Verify fact-check"
+    },
+    {
+      "domain": "bangkokpost.com",
+      "name": "Bangkok Post",
+      "type": "reputable_news",
+      "lang": ["en"],
+      "notes": "English-language Thai daily, established 1946"
+    },
+    {
+      "domain": "snopes.com",
+      "name": "Snopes",
+      "type": "reputable_news",
+      "lang": ["en"],
+      "notes": "Independent fact-checking organization"
+    },
+    {
+      "domain": "factcheck.org",
+      "name": "FactCheck.org",
+      "type": "reputable_news",
+      "lang": ["en"],
+      "notes": "Project of the Annenberg Public Policy Center, U. Penn"
+    },
+    {
+      "domain": "politifact.com",
+      "name": "PolitiFact",
+      "type": "reputable_news",
+      "lang": ["en"],
+      "notes": "Fact-checking project of Poynter Institute"
+    },
+    {
+      "domain": "fullfact.org",
+      "name": "Full Fact",
+      "type": "reputable_news",
+      "lang": ["en"],
+      "notes": "UK independent fact-checking charity"
+    },
+    {
+      "domain": "factcheck.afp.com",
+      "name": "AFP Fact Check",
+      "type": "reputable_news",
+      "lang": ["en", "multilingual", "th"],
+      "notes": "Agence France-Presse fact-checking unit; covers Thai-language misinfo"
+    }
+  ]
+}

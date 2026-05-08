@@ -1,0 +1,38 @@
+[project]
+name = "freewall-ml"
+version = "0.1.0"
+description = "Freewall ML — Synthetic Reality Detector ONNX export + PersuSafety eval (XGBoost dropped per decision #20)"
+requires-python = ">=3.13"
+dependencies = [
+    # ONNX export (HF pretrained AI detectors → browser)
+    "transformers>=4.45",
+    "optimum[exporters]>=1.23",
+    "onnx>=1.17",
+    "onnxruntime>=1.19",
+
+    # PersuSafety eval (Phase 4 mandatory per decision #11)
+    "datasets>=3.0",
+    "openai>=1.50",      # for hitting backend agents during eval
+
+    # General data / numeric (small, useful for eval analysis)
+    "pandas>=2.2",
+    "numpy>=1.26",
+
+    # Notebooks (optional, useful for EDA)
+    "jupyter>=1.1",
+    "ipykernel>=6.29",
+    "matplotlib>=3.9",
+]
+# Removed per decision #20 (2026-05-07): xgboost, scikit-learn (no model training in scope anymore).
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]

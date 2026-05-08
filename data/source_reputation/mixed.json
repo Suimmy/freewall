@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0",
+  "category": "mixed",
+  "last_updated": "2026-05-07",
+  "notes": "Generally reliable for fact reporting but with editorial bias, occasional sensationalism, or commercial conflicts of interest. Health claims here should still be cross-referenced. Bootstrapped from Claude training knowledge — Suim should verify Thai entries especially.",
+  "domains": [
+    {
+      "domain": "cnn.com",
+      "name": "CNN",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "US cable news; generally factual but with editorial bias and sensationalism in segment programming"
+    },
+    {
+      "domain": "foxnews.com",
+      "name": "Fox News",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "US cable news; right-leaning bias; news vs opinion separation matters per article"
+    },
+    {
+      "domain": "nytimes.com",
+      "name": "The New York Times",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "High quality reporting overall, left-leaning editorial; check for opinion vs news classification"
+    },
+    {
+      "domain": "wsj.com",
+      "name": "The Wall Street Journal",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "Strong news reporting, right-leaning editorial; check for opinion vs news classification"
+    },
+    {
+      "domain": "washingtonpost.com",
+      "name": "The Washington Post",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "High quality reporting, left-leaning editorial"
+    },
+    {
+      "domain": "theguardian.com",
+      "name": "The Guardian",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "UK left-leaning paper with strong investigative journalism"
+    },
+    {
+      "domain": "usatoday.com",
+      "name": "USA Today",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "Centrist US daily; some sensationalist headlines"
+    },
+    {
+      "domain": "nbcnews.com",
+      "name": "NBC News",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "US broadcast news; generally factual with mild left-lean"
+    },
+    {
+      "domain": "cbsnews.com",
+      "name": "CBS News",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "US broadcast news; generally factual with mild left-lean"
+    },
+    {
+      "domain": "dailymail.co.uk",
+      "name": "Daily Mail",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "UK tabloid; sensationalism, science misreporting common — health claims especially weak"
+    },
+    {
+      "domain": "webmd.com",
+      "name": "WebMD",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "Commercial health portal; generally accurate but ad-driven, sometimes oversimplified"
+    },
+    {
+      "domain": "healthline.com",
+      "name": "Healthline",
+      "type": "mixed_news",
+      "lang": ["en"],
+      "notes": "Commercial health portal; mostly accurate, MD-reviewed; SEO-driven content can lack nuance"
+    },
+    {
+      "domain": "hellokhunmor.com",
+      "name": "Hello คุณหมอ (Hello Khun Mor)",
+      "type": "mixed_news",
+      "lang": ["th"],
+      "notes": "Thai consumer health portal; commercial; reviewed by Thai MDs but SEO-driven — verify before citing"
+    }
+  ]
+}

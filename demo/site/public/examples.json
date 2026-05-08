@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "purpose": "20 prefilled example posts for the input box (decision #20).",
+    "owner": "Suim curates 2026-05-08 morning per JOURNAL Imminent TODO.",
+    "distribution_target": {
+      "by_label": "70% misinfo / 20% borderline / 10% legit (14 / 4 / 2)",
+      "by_language": "80% Thai / 20% English (16 / 4)",
+      "by_topic": "5 topics × 4 each (diabetes / cancer / weight_loss / supplements / cardiovascular)"
+    },
+    "schema": "src/types/index.ts → ExamplePost"
+  },
+  "examples": [
+    {
+      "id": "ex_001_curcumin_cancer",
+      "topic": "cancer",
+      "label": "misinfo",
+      "language": "th",
+      "url": "",
+      "text": "หมอไม่อยากให้รู้!! ขมิ้นชันรักษามะเร็งหายขาด 100% ป้าเพื่อนกินมา 6 เดือน เนื้องอกหายเรียบ ไม่ต้องไปเคมีให้ทรมาณ #รักษาธรรมชาติ #หมอไม่บอก",
+      "expected_score_range": "high_risk",
+      "display_emoji": "🦠",
+      "short_label": "ขมิ้นรักษามะเร็ง"
+    },
+    {
+      "id": "ex_002_who_hypertension",
+      "topic": "cardiovascular",
+      "label": "legit",
+      "language": "en",
+      "url": "",
+      "text": "Global hypertension affects 1.28 billion adults. Key prevention: limit salt to less than 5g/day, exercise 150 min/week. #WorldHypertensionDay",
+      "expected_score_range": "safe",
+      "display_emoji": "❤️",
+      "short_label": "WHO hypertension"
+    }
+  ]
+}

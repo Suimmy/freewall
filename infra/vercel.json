@@ -1,0 +1,8 @@
+{
+  "//": "Vercel deploy config — Freewall demo frontend. Connect via Vercel UI; set Root Directory to demo/site.",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "pnpm install",
+  "devCommand": "pnpm dev"
+}

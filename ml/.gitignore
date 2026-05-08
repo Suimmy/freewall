@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Training artifacts (committed model files live in backend/ or extension/public/models/)
+*.pkl
+*.onnx
+output/
+
+# Eval artifacts
+eval/results*.json
+eval/results*.csv

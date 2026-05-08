@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    font-family: theme("fontFamily.sans");
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .twitter-card {
+    @apply border border-twitter-border bg-white hover:bg-twitter-hover transition-colors;
+  }
+  .score-badge-high-risk {
+    @apply bg-risk-high/10 text-risk-high border-risk-high/40;
+  }
+  .score-badge-caution {
+    @apply bg-risk-caution/10 text-risk-caution border-risk-caution/40;
+  }
+  .score-badge-safe {
+    @apply bg-risk-safe/10 text-risk-safe border-risk-safe/40;
+  }
+}

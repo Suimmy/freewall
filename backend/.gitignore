@@ -1,0 +1,48 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- uv / venv ---
+.venv/
+venv/
+env/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- macOS ---
+.DS_Store
+
+# --- Secrets ---
+.env
+.env.local
+.env.*.local
+
+# --- Build artifacts ---
+build/
+dist/
+*.whl
+
+# --- Project-specific ---
+# Old name (legacy, never used) — superseded by chroma_db/ which IS committed
+# so Railway has the index ready at startup (no re-ingest needed).
+data/corpus/chroma_index/
+# Reasoning state cache — populated at runtime per analysis. Ephemeral; do
+# NOT commit (would leak personal text + bloat repo).
+data/reasoning_cache/
+# ML training outputs
+ml/data/
+# Generated schemas (will be auto-gen by codegen.sh — never edit by hand)
+app/schemas/_generated/

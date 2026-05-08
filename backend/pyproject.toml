@@ -1,0 +1,94 @@
+[project]
+name = "freewall-backend"
+version = "0.1.0"
+description = "Freewall — multi-agent cognitive defense backend (FastAPI + OpenAI Agents SDK)"
+requires-python = ">=3.13"
+authors = [
+    { name = "Freewall team" },
+]
+# No `readme` field — backend is an application, not a publishable package.
+
+# Runtime dependencies — installed by `uv sync`
+dependencies = [
+    # Web framework + ASGI server + SSE
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",   # [standard] adds httptools, uvloop — faster than vanilla
+    "sse-starlette>=2.1",        # SSE helper that works with FastAPI
+
+    # Data validation + settings
+    "pydantic>=2.9",             # v2 only — locked in CLAUDE.md
+    "pydantic-settings>=2.6",    # for app/config.py (env vars → typed config)
+
+    # OpenAI + Agents SDK
+    "openai>=1.55",              # core OpenAI client
+    "openai-agents>=0.0.4",      # Agents SDK — package name is `openai-agents` on PyPI
+
+    # RAG + vector DB
+    "chromadb>=0.5",             # embedded mode — runs in-process, no separate server
+
+    # ML — Sovereignty scorer
+    "scikit-learn>=1.5",
+    "xgboost>=2.1",
+    "numpy>=2.0",
+
+    # HTTP client (async) — for web search tool, source reputation lookups
+    "httpx>=0.27",
+]
+
+# Dev tools — installed by default with `uv sync`. Skip with `uv sync --no-dev`.
+[dependency-groups]
+dev = [
+    "ruff>=0.8",                 # lint + format (single tool — no black/isort per CLAUDE.md)
+    "mypy>=1.13",                # static type check
+    "pytest>=8",
+    "pytest-asyncio>=0.24",      # async test support
+    "pytest-cov>=6",             # coverage (optional, useful for risk-reduction tests)
+    "datamodel-code-generator>=0.56.1",
+]
+
+# ---------------------------------------------------------------------------
+# Tool configs — keep here so `pyproject.toml` is the single source of truth.
+# ---------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+# Sensible defaults for hackathon — strict enough to catch bugs, loose enough not to slow us down.
+select = [
+    "E", "W",   # pycodestyle errors + warnings
+    "F",        # pyflakes (unused imports, undefined names)
+    "I",        # isort (import sorting)
+    "B",        # flake8-bugbear (likely bugs)
+    "UP",       # pyupgrade (modernize syntax)
+    "ASYNC",    # async-specific lints
+]
+ignore = [
+    "E501",     # line-too-long — we let formatter handle
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.13"
+strict = false               # hackathon — loose mypy. Tighten in Phase 4 polish.
+warn_unused_ignores = true
+warn_redundant_casts = true
+ignore_missing_imports = true  # for libs without stubs (chromadb, etc.)
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"        # @pytest.mark.asyncio not required on every test
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+# uv-specific config.
+[tool.uv]
+# This project is an application, not a library to be built/published.
+# Without this, uv tries to build a wheel via hatchling — which fails (and is unnecessary for an app).
+package = false
+
+# Force uv to use ONLY its own managed Python installs (ignore miniconda / Homebrew / system Python).
+# Default would let uv pick any 3.13.x found on PATH, including miniconda's — we don't want that.
+python-preference = "only-managed"
