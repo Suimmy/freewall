@@ -2,11 +2,14 @@
 
 > Working log for the 18-hour build. Newest entries on top.
 
-**Current phase**: Phase 2 ESSENTIALLY COMPLETE (~17.5/18) → ready for Phase 3 + 4 in parallel
+**Current phase**: Phase 2 (17.5/18) + L3 (6/7) + Deploy LIVE + **Corpus audit DONE** → Phase 4 round-1 prep (warm cache + precompute + PersuSafety eval + slides + clip)
 **Hackathon window**: 2026-05-08 evening → 2026-05-09 morning
-**Today**: 2026-05-08 evening session 3 ending — fresh window will resume Phase 3 + 4
+**Today**: 2026-05-09 early morning session 4 — Ask Why fix verified on prod (`f079a81`); corpus audit DONE → 7 new fact sheets ingested (69 → 121 chunks). Next focus = warm cache + precompute re-run + PersuSafety eval before round-1 8am.
+**Corpus state**: 18 fact sheets / 121 chunks / 103 EN + 18 TH. EN sources: WHO, NIH-ODS, NIH-LiverTox, NIH-NIDDK, NIH-NCI, NIH-MedlinePlus, Harvard-Health, DermNet-NZ. TH: Mahidol-Ramathibodi.
 **Phase 2 progress**: **17.5/18 steps done**. ✅ Backend (13) + Frontend (2.14/2.15/2.16/2.16.5) + Step 2.17 Part A (Mode 2 cached AI signals). Pending: 2.17 Part B (Mode 1 live ONNX = Phase 4 stretch) + 2.18 (scorer tuning, depends on Step 6B curation).
-**Phase 2 cost**: ~$3-4 OpenAI spend cumulative (~$2.51 + Suim's demo runs + post-6 cache miss). Budget: $100, headroom 96%+.
+**L3 progress**: **6/7 demo coverage** done — Color signal A+D ✅ / Decision Pause via fake link ✅ / Ask Why modal + Mock model picker ✅ / Override + Sensitivity ✅ / Sovereignty Score + chips + Sidebar ✅ (existing) / Daily Mirror **SKIPPED** per Suim ❌
+**Deploy**: LIVE — Backend [Railway Hobby Docker, /health green](https://freewall-production.up.railway.app/) · Frontend [Vercel Hobby Vite](https://freewall.vercel.app/) · GitHub [Suimmy/freewall](https://github.com/Suimmy/freewall) · auto-deploy on `main` push
+**Phase 2 + session 4 cost**: ~$5-7 OpenAI spend cumulative. Budget: $100, headroom 93%+.
 **Test count**: 55 passed + 2 skipped
 **Live smoke totals**: Classifier 10 / Coordinator 7 / Provenance 7 / **Persuasion 9** / Fact-Check 9 / Counter 6 + 7 long-form (cross-agent) + 6 RAG = **61 unique cases**
 
@@ -61,30 +64,26 @@ Each agent's smoke test must cover ≥ 8 cases across 4 dimensions:
 >
 > Don't bury TODOs inside individual entries below — put them here so they survive the next entry.
 
-### 🟡 Imminent (next session — Phase 3 + 4)
+### 🟡 Imminent (next session — verify deploy + warm cache + eval)
 
-> **2026-05-08 evening session 3 ending** — Phase 2 = ~17.5/18 done. Ready for Phase 3 + 4.
-> Major work this session: Sibutramine Fix 1+2, L2 SSE batching bug, Fact-Check Option C
-> (-70% cost, -28% latency), Steps 2.14-2.16.5 frontend complete, Step 2.17 Part A (Mode 2
-> cached AI signals via Hello-SimpleAI), 5 UI/UX text refinements + clickable chips
-> auto-expanding sidebar agents. Plus MENTOR.md + SLIDE.md (14-slide outline).
+> **2026-05-09 early morning session 4 ending** — Phase 2 17.5/18 + L3 6/7 + Deploy LIVE.
+> Session 4 work: Railway Docker deploy (3 infra fixes — nixpacks broken, Dockerfile, python -m pip), Vercel frontend wired to live backend (`6c7bb06`), 6 L3 features (color signal, decision pause via fake link in feed_002, Ask Why modal + mock model picker, override + sensitivity, score chips + sidebar, Daily Mirror SKIPPED), feed curation 6→8 posts (feed_007 removed; 008/009 added), Ask Why fix `f079a81` verified on prod.
 >
-> **🔴 Phase 3 critical (sequential before some Phase 4)**:
-> - **PersuSafety eval** (decision #11 MANDATORY pre-pitch) — run persuasion_agent on 50-100 PersuSafety subset → measure precision/recall/F1 → number goes into Slide 5. ~1-2h, ~$3-5 cost. Owner: ML/D.
-> - **Demo corpus audit** (decision #14 — list-as-output principle) — ONLY runs after Suim Step 6B curation. Workflow: Suim sends final demo posts → Claude extracts atomic claims → runs `rag_search` → reports `[post_id] claim → coverage`. Suim approves which gaps to fill. Claude WebFetches new content → re-ingests. Goal: prevent demo dying on empty FactCheckCard. ~30-60 min.
-> - **BGE-M3 swap (elevated Phase 4 → 3)** — SOVEREIGN AI narrative. Suim has 4.3GB BGE-M3 + 2.1GB reranker local. ~2-3h. STATUS: not started this session; legitimate Phase 3 stretch.
+> **🔴 Round-1 critical (before 8am 9 พ.ค. async submission)**:
+> - **🙋 Warm cache routine** — Suim scroll all 8 feed posts + paste 2 Mode 1 examples on prod → ~$2 to populate cache entries → 50 judges async hit cache ~95% at $0/replay. ~10 min. **Run AFTER corpus push lands on Railway** (so cache contains FactCheck results from new chunks, not pre-audit empty-coverage results).
+> - **🙋 Re-run `ml/scripts/precompute_feed_signals.py`** — feed now 8 posts (was 6 when Part A first ran); current `text_ai_confidence=0.0` placeholder for ALL 8 entries breaks Provenance honest signal. Re-run Hello-SimpleAI → commit `demo/site/public/feed_ai_signals.json` → push (Vercel auto-redeploys). Image side stays manual paste per-post (prithivMLmods deepfake-detector). ~10 min.
+> - ~~**Demo corpus audit**~~ ✅ DONE 2026-05-09 — 21 claims across 10 posts audited via dual-lang `rag_search`. 6 critical gaps identified + filled with 7 new EN fact sheets (NIH-LiverTox sibutramine, NIH-NIDDK Cushing/cortisol, Harvard-Health detox/cleanse, NIH-MedlinePlus reserpine, DermNet-NZ salicylic acid, NIH-NCI targeted therapy, WHO hypertension). Re-ingest 69 → 121 chunks (`backend/data/corpus/chroma_db`). Cost $0.0003. ALL 10 demo posts now have refuting/supporting chunks → no FactCheckCard demo-death risk.
+> - **PersuSafety eval** (decision #11 MANDATORY pre-pitch) — run persuasion_agent on 50-100 PersuSafety subset → measure precision/recall/F1 → number goes into Slide 5. ~1-2h, ~$3-5 cost.
 >
-> **🔴 Phase 4 critical (deploy + content + clip)**:
-> - **Backend deploy** — Railway / Fly.io / Render. Health check + auto-restart. ~2-3h. Owner: B.
-> - **Frontend deploy (Vercel)** — connect VITE_BACKEND_URL to deployed backend. ~30 min.
-> - **🙋 Suim — curate 5 mock posts + 20 prefilled examples** (Step 6B). PLACEHOLDER_FEED in App.tsx + cache_manage.py FEED_TEXTS + precompute_feed_signals.py FEED_POSTS must all stay synced. ~1-2h.
-> - **Warm cache routine** (after deploy) — Suim/team scrolls feed once → ~$1-2 to populate 6 cache entries → judges hit cache 95%+ at $0/replay.
+> **🔴 Round-1 deliverables (per decision #19)**:
 > - **Slide deck content writing** (14 slides per `docs/SLIDE.md`). Parallel team work — owners A/B/C/D/E + Suim final. ~3-4h aggregate.
 > - **5-min clip recording + edit** (per `docs/CLIP_STORYBOARD.md`). Thai voice + bilingual captions. ~6-8h, dedicated owner. Cannot be afterthought.
 >
-> **🟡 Phase 4 stretch (if time)**:
+> **🟡 Phase 4 stretch (if time after round-1 submit)**:
+> - **L3 #7 Daily Mirror** — SKIPPED per Suim session 4. Don't revive without explicit ask.
 > - **Step 2.17 Part B** — Mode 1 live ONNX text detection in-browser. Try Xenova first (10 min check) → fallback torch.onnx.export (~30 min) → wire onnxruntime-web (~1.5h). Total ~1.5-2.5h. Slide 10 claim defensible without it ("Phase 4 wiring") but stronger demo with it.
-> - **Step 2.18 scorer tuning** — depends on Suim's 20 prefilled examples (Step 6B). Adjust scorer weights so misinfo → 15-30, legit → 85-95. ~30 min.
+> - **Step 2.18 scorer tuning** — depends on demo content scoring after corpus audit. Adjust weights so misinfo → 15-30, legit → 85-95. ~30 min.
+> - **BGE-M3 swap (Phase 3 elevated)** — SOVEREIGN AI narrative. Suim has 4.3GB BGE-M3 + 2.1GB reranker local. ~2-3h. Defer post-round-1.
 > - **Real-site (X/Twitter) live mode** plugin — original deferred decision; stretch only.
 >
 > **🟡 Open questions for Suim**:
@@ -338,7 +337,133 @@ These were considered + decided against during pre-build (2026-05-07). Captured 
 
 ## Entries
 
-## 2026-05-08 (evening session 3 — full session log) — Suim + Claude (Phase 2 COMPLETE: latency fixes + frontend + ML Part A + 5 UI refinements + MENTOR/SLIDE docs)
+## 2026-05-09 (early morning session 4 — full session log) — Suim + Claude (L3 build 6/7 + Production deploy + Ask Why fix)
+
+**Why session 4 was packed**: started new context window with Phase 2 done; 3 parallel goals — (1) L3 user-sovereignty features so demo has interaction beyond just scoring, (2) public deploy so judges can hit a real URL during async round-1, (3) feed curation refresh from 6 → 8 posts. Ended with 1 surprise prod bug (Ask Why 404) + same-night fix `f079a81`.
+
+**Major milestones (chronological)**:
+
+1. **Feed curation refresh: 6 → 8 posts** — `feed_007 (HealthBot Q&A)` REMOVED (didn't fit demo narrative). Added: `feed_008_skincare_diy` (video + DIY skincare misinfo) + `feed_009_targeted_therapy` (legit Chula targeted therapy = safe-band exemplar so judges see green-band score, not all red). Plus 2 Mode 1 examples curated: ขมิ้นรักษามะเร็ง misinfo + WHO hypertension legit. Total demo coverage = **8 feed + 2 Mode 1 = 10 posts**. PLACEHOLDER_FEED in `demo/site/src/App.tsx:22` + `demo/site/public/feed_ai_signals.json` IDs synced.
+   - **Note**: Suim originally said "7 posts" in handoff — actual = 8 (counted from JSON + App.tsx). Net +2 from 6 (feed_007 out, 008+009 in).
+
+2. **L3 Color signal (A+D)** — top-right colored dot on each PostCard + bg tint per band (red high_risk / amber caution / green safe). Visible at-a-glance scan during scroll. Per CLAUDE.md L3 spec.
+
+3. **L3 Decision Pause via fake link** (NOT Buy button) — wired into `feed_002_radican` only. Click "buy this product" link → Decision Pause modal interrupts navigation, shows score + tactics + asks "still want to proceed?". **Anti-overfit lock**: chose fake link over Buy button so Decision Pause generalizes to any commercial-intent CTA, not just e-commerce SKUs.
+
+4. **L3 Ask Why modal + Mock model picker** — click "Ask Why" on any PostCard or paste result → modal shows LLM explanation + cached contributing_factors. **Model picker** dropdown: `gpt-5.5` (active, default) + `Llama 3.3` 🔒 + `Qwen-Thai` 🔒 + `SeaLLM` 🔒 = "Year 2 plan" badge. **Pitch framing per Suim = Sovereign AI**, NOT multi-vendor integration. The point: user sees today's reality is gpt-5.5, but the architecture is provider-swappable for Year 2 sovereignty.
+
+5. **L3 Override + Sensitivity (3-tier)** — sidebar slider: `Strict / Default / Lenient` adjusts score band thresholds (e.g., Strict pulls caution→high_risk boundary up). Per-post Trust button overrides flag → result remembered in `localStorage`. State survives page reload. Per-user sovereignty over agent decisions.
+
+6. **L3 Daily Mirror — SKIPPED per Suim** — was originally L3 #7 in CLAUDE.md spec (end-of-day reflection: bar chart of top tactics seen today + score histogram). Suim cut for round-1 scope. **Don't revive** without explicit Suim trigger. Defer to post-MVP nice-to-have.
+
+7. **Production deploy — Backend (Railway Hobby)** — 3 infra commits to land working Docker build:
+   - `1c89ec3 fix(infra): use 'python -m pip' for nixpacks build` — first attempt with nixpacks, pip command not found at build step.
+   - `9efdc7c fix(infra): switch to Dockerfile builder (nixpacks uv autodetect broken)` — nixpacks uv autodetection broken upstream → switched to explicit `Dockerfile` (python:3.13-slim + uv install). Stable.
+   - **Backend self-contained data**: copied `data/corpus/` + `data/source_reputation/` into `backend/` so Docker image has them. `services/rag.py` + `tools/source_lookup.py` updated to read `CHROMA_DIR` / `SOURCE_REP_DIR` env vars w/ fallback to `backend/parents[2-3]` for local dev.
+   - Railway env vars: `OPENAI_API_KEY`, `USE_MOCK_AGENTS=false`, `ENV=prod`, `LOG_LEVEL=INFO`, `CORS_ALLOWED_ORIGINS` (4 entries: vercel.app + railway.app + localhost variants).
+   - `/health` returns green ✅. Live URL: https://freewall-production.up.railway.app/
+
+8. **Production deploy — Frontend (Vercel Hobby)** — `6c7bb06 feat(infra): wire production frontend to live Railway backend`. `VITE_BACKEND_URL` env var set in Vercel → built-time injection → SSE + POST hit Railway. Live URL: https://freewall.vercel.app/
+
+9. **Ask Why prod bug + fix `f079a81`** — Suim ran first prod test → Mode 1 paste → score returned ✅ → clicked Ask Why → **404 content_not_found**. Diagnosed: Mode 1 paste sets `force_fresh=True` → `_skip_cache_write=True` → orchestrator skips `cache.set` at end → `/ask-why` reads `cache.get(content_id)` → None → 404.
+   - **Fix** ([perceive_text.py:163](backend/app/api/routes/perceive_text.py:163)): force `_skip_cache_write = False` always. `force_fresh` now controls ONLY `cache.get` bypass (force real LLM run); `cache.set` always fires so downstream features (Ask Why now, future on-demand Counter-Perspective re-fetch, etc.) can read state.
+   - **Trade-off accepted**: Mode 1 paste of same content twice = real LLM both times (force_fresh stays bypassed) + 2nd run OVERWRITES cached state. Intended — fresh run = newer state.
+   - Logger branch at [orchestrator.py:1018](backend/app/services/orchestrator.py:1018) ("force_fresh=true: skipping cache.set") now unreachable from `/perceive-text` route. Left for safety (other callers might set the flag in future).
+   - **Verified**: pytest 55 + 2 skipped, no regression. Suim confirmed Ask Why works on prod after Railway redeploy.
+
+**Decisions locked this session (DO NOT re-debate)**:
+- Daily Mirror SKIPPED for round-1 (per Suim)
+- Decision Pause via fake link, not Buy button (anti-overfit lock — generalizes to any CTA)
+- Mock model picker = Sovereign AI pitch framing, NOT multi-vendor integration sales angle
+- Dockerfile builder over nixpacks (nixpacks uv autodetect broken upstream as of 2026-05)
+- Backend self-contained data (corpus + source_reputation copied into `backend/` for Docker)
+- Mode 1 paste ALWAYS writes cache (force_fresh = read-bypass only, not write-bypass)
+
+**Anti-overfit locks reaffirmed**:
+- Did NOT add Phentamine corpus during session 4 (corpus audit in next session via list-as-output workflow per decision #14)
+- Decision Pause not tied to specific product SKU (fake link generalizes)
+- Mock model picker shows real provider names but doesn't fake outputs (locked = display-only Year 2 placeholder)
+
+**Honest known limitations**:
+- `text_ai_confidence=0.0` placeholder for ALL 8 feed posts in `feed_ai_signals.json` — Hello-SimpleAI Part A only ran on 6 posts. Need re-run for 8 (~10 min).
+- Image AI confidence Suim paste-by-hand 4 of 8 posts (002 0.9655 / 003 0.0679 / 004 0.325 / 008 0.2230) — feed_001/005/006/009 = no image signal yet.
+- JOURNAL session 4 entry written AFTER session 4 work — context-recovery write, not real-time. Some milestone ordering reconstructed from git log + Suim handoff.
+- Demo corpus NOT yet audited against the 8 new feed posts — refutable claims may FactCheckCard-die-blank if no relevant chunk. Audit is next imminent task.
+
+**Files modified this session** (estimated from git):
+- Frontend L3 (~10 files): `App.tsx` + new `components/AskWhyModal.tsx` + `DecisionPause.tsx` + Sidebar updates (sensitivity slider) + PostCard color signal + override Trust button + types + localStorage helper
+- Backend deploy: `Dockerfile` (NEW) + `services/rag.py` (CHROMA_DIR env) + `tools/source_lookup.py` (SOURCE_REP_DIR env) + `data/corpus/` + `data/source_reputation/` copied into `backend/`
+- Backend Ask Why fix: `api/routes/perceive_text.py` (1 line + 4 lines comment)
+- Feed curation: `App.tsx` PLACEHOLDER_FEED + `feed_ai_signals.json` (added 008/009, removed 007) + `feed_images/` + `feed_videos/` (002.png, 003.mp4, 004.png, 006.jpg, 008.mp4)
+- Infra config: Railway env vars (UI-side, not in repo)
+- `JOURNAL.md` (this entry — written session 5 boundary 2026-05-09 early morning)
+
+**Phase 2 + L3 + deploy cumulative cost**: ~$5-7 / $100 budget = 93-95% headroom remaining. Demo + Ask Why fix verification pushed cost up from ~$3-4 (post-session-3) to ~$5-7 estimate. Budget extremely safe for round-1 + warm cache + corpus audit + PersuSafety eval.
+
+**Next session focus** (immediate, before round-1 8am 9 พ.ค. submit):
+1. ~~Demo corpus audit~~ ✅ DONE same session — see addendum below
+2. Re-run `precompute_feed_signals.py` on 8 posts (Suim trigger)
+3. Warm cache routine (Suim scroll prod) — AFTER corpus push lands
+4. PersuSafety eval (mandatory pre-pitch per #11)
+5. Slide deck content writing (parallel team)
+6. 5-min clip recording (parallel dedicated owner)
+
+---
+
+### Addendum 2026-05-09 (mid-morning session 4 cont.) — Demo corpus audit + 7 fact sheets ingested
+
+**Why**: per CLAUDE.md decision #14 list-as-output workflow — after deploy + L3 done, audit demo corpus coverage against finalised 8 feed + 2 Mode 1 = 10 posts (23 atomic claims, ≤3 per post per Step 2.9 limit). Goal: prevent demo-death where judges paste a viral post and FactCheckCard returns blank "unverifiable".
+
+**Workflow executed**:
+1. Wrote `backend/scripts/corpus_audit.py` — hardcoded 23 claims with paired translations, runs dual-lang `rag.query` per claim, prints top-3 chunks with publisher/topic/snippet
+2. First run failed — Chroma collection empty. Diagnosed: main repo `.env` had `CHROMA_DIR=data/chroma_index` (legacy path) → wrapper resolved to empty dir → "no hits" everywhere
+3. Wrote `backend/scripts/_run_corpus_audit_local.py` (gitignored) — loads main repo `.env` via python-dotenv, then explicitly overrides `os.environ["CHROMA_DIR"]` to worktree's bundled `backend/data/corpus/chroma_db` path
+4. Re-ran audit — 23 claims × 2 dual-lang searches = 46 `rag.query` calls. Identified **6 critical gaps + 1 weak coverage** (5 misinfo posts at risk of demo-death + 1 LEGIT post at risk of unverifiable safe-band exemplar)
+5. WebFetched 7 sources in parallel — 4 succeeded first try (NIH-LiverTox, NIDDK, MedlinePlus, NCI, WHO), 3 retried with alternatives (FDA→NIH-LiverTox NBK547852, Mayo→NIDDK + Harvard, Cleveland→DermNet-NZ)
+6. Wrote 7 markdown fact sheets to `backend/data/corpus/en/{nih,harvard,dermnet,who}/` with proper YAML frontmatter (source_url + source_org + lang + topic). 2 new dirs created: `harvard/` + `dermnet/`
+7. Wrote `backend/scripts/_run_ingest_local.py` (gitignored) — loads `.env` + invokes `data/corpus/ingest.py main()` programmatically with `--corpus-dir backend/data/corpus --reset`
+8. Re-ingest: **69 → 121 chunks** (+52 new EN chunks). Cost $0.0003. Final breakdown: WHO 51 / Mahidol 18 / NIH-ODS 8 / NIH-LiverTox 7 / NIH-NIDDK 7 / NIH-NCI 8 / NIH-MedlinePlus 8 / Harvard 7 / DermNet 7
+9. Re-ran audit — verified all 6 gaps closed:
+   - feed_002 Radican → Harvard-Health/cleanse `Common detox claims` #1 ✅
+   - feed_009 targeted therapy LEGIT → NIH-NCI `Biomarker testing requirement` #1 + `Small molecule inhibitors` + ADC + monoclonal ✅
+   - feed_003 cortisol → NIH-NIDDK `How high cortisol affects body weight` #1 + Harvard `Microbiome and cortisol claims` #1 ✅
+   - feed_004 Rauwolfia → NIH-MedlinePlus `Why raw Rauwolfia plant use is unsafe` #1 + depression/suicide warning ✅
+   - feed_005 Sibutramine → NIH-LiverTox `Counterfeit and grey market concerns` #1 + Overview + SCOUT trial ✅
+   - feed_008 skincare DIY → DermNet-NZ `Why DIY skincare is risky` #1 + `DIY salicylic acid from aspirin` ✅
+   - ex_002 hypertension LEGIT → WHO/cardiovascular `Key facts` (1.4B 2024 update) + `Prevention` (salt/exercise) ✅
+
+**Anti-overfit locks reaffirmed**:
+- Curated demo content first, then audited list-as-output, then filled gaps (per decision #14 — NOT picked content to fit existing corpus)
+- New fact sheets fetched from authoritative orgs (WHO/NIH/Harvard/DermNet), not synthesized from training data
+- Each fact sheet preserves source_url frontmatter so FactCheckCard cites real authority
+
+**Honest known limitations**:
+- WHO updated hypertension figure 1.28B (2023) → 1.4B (2024). Mode 1 example `ex_002_who_hypertension` still says 1.28B — Fact-Check Agent may flag with "supported with caveat: WHO 2024 update revised to 1.4 billion". Not changed (per anti-overfit; correct interpretation = agent doing precise verification)
+- Thai-language searches still return Mahidol off-topic chunks for some queries — orthogonal to this audit; mitigated by Step 2.9 dual-lang rag_search in Fact-Check Agent prompt
+- Audit script header constant (`11 fact sheets / 69 chunks`) updated to current state in same edit
+
+**Files added/modified this addendum**:
+- `backend/data/corpus/en/nih/sibutramine-withdrawal.md` (NEW)
+- `backend/data/corpus/en/nih/cushings-syndrome.md` (NEW)
+- `backend/data/corpus/en/nih/reserpine-safety.md` (NEW)
+- `backend/data/corpus/en/nih/targeted-therapies.md` (NEW)
+- `backend/data/corpus/en/harvard/detox-cleanse-myth.md` (NEW + new dir)
+- `backend/data/corpus/en/dermnet/salicylic-acid-skincare.md` (NEW + new dir)
+- `backend/data/corpus/en/who/hypertension.md` (NEW)
+- `backend/data/corpus/chroma_db/*` (rebuilt, +52 chunks)
+- `backend/scripts/corpus_audit.py` (NEW — committed for future audits)
+- `backend/scripts/_run_corpus_audit_local.py` (NEW — gitignored)
+- `backend/scripts/_run_ingest_local.py` (NEW — gitignored)
+- `backend/scripts/corpus_audit_output.txt` (gitignored — ephemeral)
+- `backend/.gitignore` (added wrapper + audit-output patterns)
+
+**Cost cumulative this addendum**: ~$0.0005 (rag.query embeddings + ingest embeddings). Phase 2 + L3 + deploy + audit total: ~$5-7 / $100 = 93%+ headroom.
+
+**Next**: warm cache routine + precompute re-run + PersuSafety eval before round-1 8am.
+
+---
+
+
 
 **Why session 3 was so dense**: started with first live demo run (sibutramine paste, score=54), kept finding real issues only visible at runtime, fixed each, ended with Phase 2 essentially complete. Every fix was honest discovery from actual demo behavior — not speculative.
 

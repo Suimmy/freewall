@@ -29,6 +29,11 @@ env/
 .env
 .env.local
 .env.*.local
+# Local-only wrappers that load secrets from main repo's .env (per Suim
+# 2026-05-09 — worktree mode, no .env in worktree). Never commit; never share.
+scripts/_run_*_local.py
+# Ephemeral audit output (regenerated each run via corpus_audit.py wrapper).
+scripts/corpus_audit_output.txt
 
 # --- Build artifacts ---
 build/
