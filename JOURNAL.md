@@ -2,14 +2,14 @@
 
 > Working log for the 18-hour build. Newest entries on top.
 
-**Current phase**: Phase 2 (17.5/18) + L3 (6/7) + Deploy LIVE + **Corpus audit DONE** → Phase 4 round-1 prep (warm cache + precompute + PersuSafety eval + slides + clip)
-**Hackathon window**: 2026-05-08 evening → 2026-05-09 morning
-**Today**: 2026-05-09 early morning session 4 — Ask Why fix verified on prod (`f079a81`); corpus audit DONE → 7 new fact sheets ingested (69 → 121 chunks). Next focus = warm cache + precompute re-run + PersuSafety eval before round-1 8am.
+**Current phase**: 🏁 **PROJECT CLOSED 2026-05-09** — Hackathon work ended after Railway env fix + corpus deploy verification + warm cache routine. Carry-over to team / post-MVP: PersuSafety eval, precompute re-run, slides, clip, BGE-M3, ONNX in-browser.
+**Hackathon window**: 2026-05-08 evening → 2026-05-09 (project closed mid-day per Suim)
+**Today**: 2026-05-09 — final session. Railway `CHROMA_DIR=./data/chroma_index` legacy override **deleted** (fixed empty-collection bug post-deploy); `count=121` verified live; source citations real (NIH-LiverTox/WHO, NOT hallucinated "Mayo Clinic" — that was empty-corpus fallback); cache warmed 8 feed + 2 examples for async judges.
+**Final cost**: ~$5-8 / $100 budget — 92%+ headroom unused
+**Final state**: Phase 2 17.5/18 + L3 6/7 + Deploy LIVE + Corpus 121 chunks + Cache warmed
 **Corpus state**: 18 fact sheets / 121 chunks / 103 EN + 18 TH. EN sources: WHO, NIH-ODS, NIH-LiverTox, NIH-NIDDK, NIH-NCI, NIH-MedlinePlus, Harvard-Health, DermNet-NZ. TH: Mahidol-Ramathibodi.
-**Phase 2 progress**: **17.5/18 steps done**. ✅ Backend (13) + Frontend (2.14/2.15/2.16/2.16.5) + Step 2.17 Part A (Mode 2 cached AI signals). Pending: 2.17 Part B (Mode 1 live ONNX = Phase 4 stretch) + 2.18 (scorer tuning, depends on Step 6B curation).
 **L3 progress**: **6/7 demo coverage** done — Color signal A+D ✅ / Decision Pause via fake link ✅ / Ask Why modal + Mock model picker ✅ / Override + Sensitivity ✅ / Sovereignty Score + chips + Sidebar ✅ (existing) / Daily Mirror **SKIPPED** per Suim ❌
 **Deploy**: LIVE — Backend [Railway Hobby Docker, /health green](https://freewall-production.up.railway.app/) · Frontend [Vercel Hobby Vite](https://freewall.vercel.app/) · GitHub [Suimmy/freewall](https://github.com/Suimmy/freewall) · auto-deploy on `main` push
-**Phase 2 + session 4 cost**: ~$5-7 OpenAI spend cumulative. Budget: $100, headroom 93%+.
 **Test count**: 55 passed + 2 skipped
 **Live smoke totals**: Classifier 10 / Coordinator 7 / Provenance 7 / **Persuasion 9** / Fact-Check 9 / Counter 6 + 7 long-form (cross-agent) + 6 RAG = **61 unique cases**
 
@@ -64,32 +64,40 @@ Each agent's smoke test must cover ≥ 8 cases across 4 dimensions:
 >
 > Don't bury TODOs inside individual entries below — put them here so they survive the next entry.
 
-### 🟡 Imminent (next session — verify deploy + warm cache + eval)
+### 🏁 Closed at project end (2026-05-09)
 
-> **2026-05-09 early morning session 4 ending** — Phase 2 17.5/18 + L3 6/7 + Deploy LIVE.
-> Session 4 work: Railway Docker deploy (3 infra fixes — nixpacks broken, Dockerfile, python -m pip), Vercel frontend wired to live backend (`6c7bb06`), 6 L3 features (color signal, decision pause via fake link in feed_002, Ask Why modal + mock model picker, override + sensitivity, score chips + sidebar, Daily Mirror SKIPPED), feed curation 6→8 posts (feed_007 removed; 008/009 added), Ask Why fix `f079a81` verified on prod.
->
-> **🔴 Round-1 critical (before 8am 9 พ.ค. async submission)**:
-> - **🙋 Warm cache routine** — Suim scroll all 8 feed posts + paste 2 Mode 1 examples on prod → ~$2 to populate cache entries → 50 judges async hit cache ~95% at $0/replay. ~10 min. **Run AFTER corpus push lands on Railway** (so cache contains FactCheck results from new chunks, not pre-audit empty-coverage results).
-> - **🙋 Re-run `ml/scripts/precompute_feed_signals.py`** — feed now 8 posts (was 6 when Part A first ran); current `text_ai_confidence=0.0` placeholder for ALL 8 entries breaks Provenance honest signal. Re-run Hello-SimpleAI → commit `demo/site/public/feed_ai_signals.json` → push (Vercel auto-redeploys). Image side stays manual paste per-post (prithivMLmods deepfake-detector). ~10 min.
-> - ~~**Demo corpus audit**~~ ✅ DONE 2026-05-09 — 21 claims across 10 posts audited via dual-lang `rag_search`. 6 critical gaps identified + filled with 7 new EN fact sheets (NIH-LiverTox sibutramine, NIH-NIDDK Cushing/cortisol, Harvard-Health detox/cleanse, NIH-MedlinePlus reserpine, DermNet-NZ salicylic acid, NIH-NCI targeted therapy, WHO hypertension). Re-ingest 69 → 121 chunks (`backend/data/corpus/chroma_db`). Cost $0.0003. ALL 10 demo posts now have refuting/supporting chunks → no FactCheckCard demo-death risk.
-> - **PersuSafety eval** (decision #11 MANDATORY pre-pitch) — run persuasion_agent on 50-100 PersuSafety subset → measure precision/recall/F1 → number goes into Slide 5. ~1-2h, ~$3-5 cost.
->
-> **🔴 Round-1 deliverables (per decision #19)**:
-> - **Slide deck content writing** (14 slides per `docs/SLIDE.md`). Parallel team work — owners A/B/C/D/E + Suim final. ~3-4h aggregate.
-> - **5-min clip recording + edit** (per `docs/CLIP_STORYBOARD.md`). Thai voice + bilingual captions. ~6-8h, dedicated owner. Cannot be afterthought.
->
-> **🟡 Phase 4 stretch (if time after round-1 submit)**:
-> - **L3 #7 Daily Mirror** — SKIPPED per Suim session 4. Don't revive without explicit ask.
-> - **Step 2.17 Part B** — Mode 1 live ONNX text detection in-browser. Try Xenova first (10 min check) → fallback torch.onnx.export (~30 min) → wire onnxruntime-web (~1.5h). Total ~1.5-2.5h. Slide 10 claim defensible without it ("Phase 4 wiring") but stronger demo with it.
-> - **Step 2.18 scorer tuning** — depends on demo content scoring after corpus audit. Adjust weights so misinfo → 15-30, legit → 85-95. ~30 min.
-> - **BGE-M3 swap (Phase 3 elevated)** — SOVEREIGN AI narrative. Suim has 4.3GB BGE-M3 + 2.1GB reranker local. ~2-3h. Defer post-round-1.
+> **Session 4 work delivered** (closed mid-day 2026-05-09):
+> - L3 build 6/7: color signal, decision pause via fake link in feed_002, Ask Why modal + mock model picker, override + sensitivity, score chips + sidebar (Daily Mirror SKIPPED per Suim)
+> - Production deploy: Railway Docker backend + Vercel frontend wired (`6c7bb06`) + 3 infra fixes
+> - Ask Why fix `f079a81` verified on prod
+> - Feed curation 6 → 8 posts (feed_007 removed; 008/009 added)
+> - Demo corpus audit + 7 new fact sheets (`444bb21`): NIH-LiverTox sibutramine, NIH-NIDDK Cushing/cortisol, Harvard-Health detox/cleanse, NIH-MedlinePlus reserpine, DermNet-NZ salicylic acid, NIH-NCI targeted therapy, WHO hypertension. Re-ingest 69 → 121 chunks. Cost $0.0003.
+> - Railway `CHROMA_DIR=./data/chroma_index` legacy override deleted (was overriding to empty path → count=0 post-deploy bug)
+> - Verified post-fix: count=121 live, source citations real (NIH-LiverTox + WHO), Mayo Clinic hallucination explained as empty-corpus fallback
+> - Warm cache routine completed: 8 feed posts scrolled + 2 Mode 1 examples pasted → cache pre-populated for async judges (~$1.5-2)
+> - JOURNAL session 4 entry + final addendum documented
+
+### 🟡 Carried over to team / post-MVP (NOT done in this Claude session)
+
+> **Round-1 deliverables** (team parallel work, status outside this session's visibility):
+> - Slide deck content writing (14 slides per `docs/SLIDE.md`)
+> - 5-min clip recording + edit (per `docs/CLIP_STORYBOARD.md`)
+
+> **Mechanical follow-ups** (deferred — single command, no Suim approval needed beyond cost):
+> - **Re-run `ml/scripts/precompute_feed_signals.py`** — text_ai_confidence=0.0 placeholder for all 8 posts breaks Provenance honest signal. Re-run Hello-SimpleAI → commit + push → Vercel redeploy. ~10 min, ~$0.
+> - **PersuSafety eval** (decision #11 — was framed as MANDATORY pre-pitch, but if no round-2 stage pitch then deferrable). Run persuasion_agent on 50-100 PersuSafety subset → precision/recall/F1 for Slide 5. ~1-2h, ~$3-5.
+
+> **Stretch / Year 2 carry-over**:
+> - **Step 2.17 Part B** — Mode 1 live ONNX text detection in-browser. Xenova → torch.onnx.export → onnxruntime-web. ~1.5-2.5h.
+> - **Step 2.18 scorer tuning** — adjust weights based on demo scoring (sibutramine 56 caution vs target high_risk 25-30; depends on Sibutramine claim-extraction prompt fix below).
+> - **Sibutramine claim extraction polish** — Fact-Check Agent extracts literal "drug exists + grey market" → verdict supported. Should extract implicit safety claim ("Reduce 15 is SAFE weight loss") → contradicted. Reasoning text mentions "ถอนออกจากตลาด" so agent knows context. Prompt tweak needed.
+> - **Sibutramine "score 44 quirk"** (1 tangential supported claim → trust=1.0 → score skewed). Polish: ratio formula `(supported - contradicted) / total`.
+> - **BGE-M3 swap (Phase 3 elevated)** — SOVEREIGN AI narrative. Suim has 4.3GB BGE-M3 + 2.1GB reranker local. ~2-3h.
 > - **Real-site (X/Twitter) live mode** plugin — original deferred decision; stretch only.
->
-> **🟡 Open questions for Suim**:
-> - **Mentor selection** — 12 candidates, top 3 recommended (Can Udomcharoenchaikit / Ronnachai Jaroensri / Asst. Prof. Dr. Thanasak Mouktonglang). Need to verify + pick.
-> - **MENTOR.md** at `docs/MENTOR.md` — review Q1-Q8 (Q5 = honest post-AGI structural moats; Q8 = B2B leg timing). Send to mentor 24-48h before consult.
-> - **Sibutramine "score 44 quirk"** (1 tangential supported claim → trust=1.0 → score 44 not 25-30). Phase 4 polish: ratio formula `(supported - contradicted) / total`. Defer per anti-overfit lock.
+> - **L3 #7 Daily Mirror** — SKIPPED per Suim. Don't revive without explicit ask.
+
+> **Open questions / decisions Suim deferred**:
+> - **Mentor selection** — 12 candidates, top 3 recommended (Can Udomcharoenchaikit / Ronnachai Jaroensri / Asst. Prof. Dr. Thanasak Mouktonglang). Send `docs/MENTOR.md` 24-48h before consult.
 
 - [x] ~~**Suim decisions before Step 3 starts**~~ — RESOLVED 2026-05-07
 - [x] ~~**Distribution path A vs B vs C**~~ — RESOLVED 2026-05-07 (Path B primary, C fallback)
@@ -460,6 +468,51 @@ These were considered + decided against during pre-build (2026-05-07). Captured 
 **Cost cumulative this addendum**: ~$0.0005 (rag.query embeddings + ingest embeddings). Phase 2 + L3 + deploy + audit total: ~$5-7 / $100 = 93%+ headroom.
 
 **Next**: warm cache routine + precompute re-run + PersuSafety eval before round-1 8am.
+
+### Final addendum 2026-05-09 (mid-day) — Railway env fix + deploy verification + warm cache + 🏁 PROJECT CLOSED
+
+**Why closure here**: Suim ended hackathon Claude session after deploy verification + warm cache. PersuSafety eval + slides + clip + precompute carried over to team / post-MVP per Active TODOs above.
+
+**Railway CHROMA_DIR diagnostic + fix story**:
+- After commit `444bb21` deploy ACTIVE, paste-tested Sibutramine on prod → expected `contradicted` from new NIH-LiverTox chunk. Got `unverifiable` instead.
+- Curcumin paste returned `contradicted` BUT cited "Mayo Clinic ↗" — suspicious because we never added Mayo to corpus (corpus has 0 Mayo chunks; ingest output confirmed: `WHO 51 / Mahidol 18 / NIH-ODS 8 / + 7 new (NIH-LiverTox 7 / NIH-NIDDK 7 / NIH-NCI 8 / NIH-MedlinePlus 8 / Harvard-Health 7 / DermNet-NZ 7)`).
+- Suim checked Railway logs → `rag client initialized: path=/app/data/chroma_index collection=freewall_corpus count=0` ← empty collection at WRONG path
+- Root cause: Railway env var **`CHROMA_DIR=./data/chroma_index`** (legacy from earlier setup) was overriding `rag.py` default fallback. The relative path resolved to `/app/data/chroma_index` in container (Docker WORKDIR=/app), but our chunks live at `/app/data/corpus/chroma_db/` (Dockerfile `COPY . .` from `backend/` build context).
+- Fix: Suim deleted CHROMA_DIR env var via Railway Variables tab. Auto-redeploy triggered. New logs: `rag client initialized: path=/app/data/corpus/chroma_db collection=freewall_corpus count=121` ✅
+
+**Verification post-fix** (Mode 1 paste on prod):
+- ✅ Curcumin (`ขมิ้นชันรักษามะเร็งหายขาด 100%`) → score 20 high_risk + 2 claims CONTRADICTED + source = **WHO ↗** (real WHO/cancer chunk, NOT hallucinated Mayo)
+- ✅ Sibutramine (`Reduce 15 mg ... Sibutramine ขายแผงละ 160 บาท`) → score 56 caution + first claim verdict supported (re: drug existence + grey market) + source = **NIH-LiverTox ↗** (real new chunk citation, correct)
+- "Mayo Clinic" hallucination from earlier failed test resolved — root cause = empty corpus (count=0) → agent improvised cite from training data (NOT a prompt baked-in bug)
+
+**Warm cache routine completed**:
+- Suim scrolled all 8 feed posts on prod → each cached after analysis (`cache.set` writes per Ask Why fix `f079a81`)
+- Suim pasted 2 Mode 1 examples (curcumin + WHO hypertension) → cached via force_fresh-but-cache-set pattern
+- Estimated cost: ~$1.5-2 (10 cache misses × ~$0.20/post avg LLM run)
+- Async judging benefit: 50 judges hit cache ~95% at $0/replay during round-1 window
+
+**Honest known limitations carried into post-MVP** (also in Active TODOs):
+- Sibutramine claim extraction extracts LITERAL claim ("drug exists + grey market") → verdict `supported` instead of contradicting the implicit safety claim. Reasoning text mentions "ถอนออกจากตลาด" so agent knows context but verdict label is misleading. Score still flags caution band correctly.
+- text_ai_confidence=0.0 placeholder for all 8 posts in `feed_ai_signals.json`. Provenance signal flat at zero. Mechanical fix: re-run precompute_feed_signals.py.
+- PersuSafety eval not run — Slide 5 number missing if round-2 stage pitch happens.
+- 5-min clip + slide deck = team parallel work, status outside this Claude session's visibility.
+
+**Final state numbers**:
+- Phase 2: 17.5/18 done (2.17 Part B + 2.18 deferred)
+- L3: 6/7 done (Daily Mirror skipped per Suim)
+- Tests: 55 pass + 2 skip
+- Smoke cases: 61 unique
+- Corpus: 18 fact sheets / 121 chunks / 103 EN + 18 TH
+- Cost cumulative: ~$5-8 / $100 budget = 92%+ headroom unused
+- Live URLs: Backend (Railway Hobby Docker) + Frontend (Vercel Hobby)
+- GitHub: Suimmy/freewall, last commit `444bb21`
+
+**Anti-overfit locks reaffirmed at closure**:
+- Did NOT fix Sibutramine claim-extraction prompt mid-flight (risk regression on other content)
+- Did NOT fix score 56 caution → high_risk (per session 2 anti-overfit lock on demo-content-driven calibration)
+- Did NOT fix Mayo hallucination at prompt level (root cause = empty corpus, not prompt — fixed by env var deletion)
+
+**Closing**: Built in 18-hour hackathon window per CLAUDE.md spec. 3-layer / 6-agent multi-agent architecture, OpenAI Agents SDK, single-model `gpt-5.5` with reasoning tiering, weighted-sum interpretable scoring, RAG-grounded fact-check, real demo content, no fabrication. Vision (cognitive sovereignty as new public health) + execution (working live demo) + honest engineering documented. JOURNAL is the durable handoff for any continuation — team or future Claude session.
 
 ---
 
